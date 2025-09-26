@@ -614,7 +614,7 @@ async def export_data(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 # /start command
 @admin_required
-async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
+async def startapp(update: Update, context: ContextTypes.DEFAULT_TYPE):
     welcome_text = get_help_text()
     await update.message.reply_text(welcome_text)
 
@@ -642,7 +642,7 @@ def main():
             )
 
     # === Handlers
-    app.add_handler(CommandHandler("start", start))
+    app.add_handler(CommandHandler("start", startapp))
     app.add_handler(CommandHandler("help", help_command))
     app.add_handler(CommandHandler("new", new_client))
     app.add_handler(CommandHandler("token", token_info))
