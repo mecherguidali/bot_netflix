@@ -118,12 +118,6 @@ def get_help_text():
         "/help new - Get detailed help for the new command\n"
     )
 
-# /start command
-@admin_required
-async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    welcome_text = get_help_text()
-    await update.message.reply_text(welcome_text)
-    
 # /help command
 @admin_required
 async def help_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -343,8 +337,8 @@ async def token_info(update: Update, context: ContextTypes.DEFAULT_TYPE):
             f"👤 Name: {name}\n"
             f"📧 Email: {email}\n"
             f"📺 Profile: {profile}\n"
-            f"📅 Start: {start}\n"
-            f"📅 End: {end}\n"
+            f"📅 Start: {start_date}\n"
+            f"📅 End: {end_date}\n"
             f"💰 Status: {status}\n"
             f"{payment_info}"
             f"⏳ Days Left: {days_left}"
@@ -617,6 +611,12 @@ async def export_data(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await update.message.reply_text(f"❌ Error exporting data: {e}")
         logger.error(f"Error in export_data: {e}", exc_info=True)
 
+
+# /start command
+@admin_required
+async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    welcome_text = get_help_text()
+    await update.message.reply_text(welcome_text)
 
 def main():
     app = Application.builder().token(BOT_TOKEN).build()
