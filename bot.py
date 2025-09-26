@@ -271,8 +271,8 @@ async def new_client(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
         # parse duration
         delta = parse_duration(duration_str)
-        start = datetime.now()
-        end = start + delta
+        start_date = datetime.now()
+        end_date = start_date + delta
 
         # save in DB
         add_client(token, name, email, profile, duration_str)
@@ -283,8 +283,8 @@ async def new_client(update: Update, context: ContextTypes.DEFAULT_TYPE):
             f"👤 {name}\n"
             f"📧 {email}\n"
             f"📺 {profile}\n"
-            f"📅 Start: {start.strftime('%d-%m-%Y %H:%M')}\n"
-            f"📅 End: {end.strftime('%d-%m-%Y %H:%M')}\n"
+            f"📅 Start: {start_date.strftime('%d-%m-%Y %H:%M')}\n"
+            f"📅 End: {end_date.strftime('%d-%m-%Y %H:%M')}\n"
             f"⏱ Duration: {duration_str}\n"
             f"🔑 Token: {token}\n"
             f"💰 Status: Unpaid"
