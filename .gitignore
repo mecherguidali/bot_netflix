@@ -1,0 +1,7 @@
+venv/
+.env/
+env/
+myenv/
+exports/
+clients.db
+__pycache__
