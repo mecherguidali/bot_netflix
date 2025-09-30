@@ -364,12 +364,17 @@ async def token_info(update: Update, context: ContextTypes.DEFAULT_TYPE):
     token = context.args[0]
     client = get_client_by_token(token)
     if client:
-        # Check if the client tuple has payment_amount (for backward compatibility)
-        if len(client) >= 9:
-            _, _, name, email, profile, start, end, status, payment_amount = client
-        else:
-            _, _, name, email, profile, start, end, status = client
-            payment_amount = 0.0
+        # Extract the fields we need from the client tuple
+        # The client tuple structure is: [id, token, name, email, profile, start_date, end_date, status, payment_amount, is_burned, burn_reason, burn_date]
+        client_id = client[0] if len(client) > 0 else ""
+        name = client[2] if len(client) > 2 else ""
+        email = client[3] if len(client) > 3 else ""
+        profile = client[4] if len(client) > 4 else ""
+        start = client[5] if len(client) > 5 else ""
+        end = client[6] if len(client) > 6 else ""
+        status = client[7] if len(client) > 7 else ""
+        payment_amount = float(client[8]) if len(client) > 8 and client[8] else 0.0
+        is_burned = client[9] == "1" if len(client) > 9 else False
         
         # Try to parse with time component first, then fall back to just date
         try:
@@ -386,29 +391,51 @@ async def token_info(update: Update, context: ContextTypes.DEFAULT_TYPE):
         # Prepare payment info
         payment_info = ""
         if payment_amount and payment_amount > 0:
-            payment_info = f"💵 Payment: {payment_amount}\n"
+            payment_info = f"💵 Payment: {payment_amount} TND\n"
         
-        reply = (
-            f"🔎 *Client Details:*\n\n"
-            f"🔑 Token: `{token}`\n"
-            f"👤 Name: {name}\n"
-            f"📧 Email: {email}\n"
-            f"📺 Profile: {profile}\n"
-            f"📅 Start: {start}\n"
-            f"📅 End: {end}\n"
-            f"💰 Status: {status}\n"
-            f"{payment_info}"
-            f"⏳ Days Left: {days_left}"
-        )
+        # Format status with emoji
+        status_emoji = "✅" if status == "Paid" else "⏳"
+        
+        # Add burned status if applicable
+        burned_info = ""
+        if is_burned:
+            burn_reason = client[10] if len(client) > 10 else "Unknown reason"
+            burn_date = client[11] if len(client) > 11 else ""
+            burned_info = f"🔥 *BURNED*: {burn_reason}\n"
+            if burn_date:
+                burned_info += f"📅 Burned on: {burn_date}\n"
+            status_emoji = "🔥"  # Override status emoji for burned tokens
+        
+        # Calculate days left only if not burned
+        days_left_info = ""
+        if not is_burned:
+            days_left = (end_date - datetime.now()).days
+            days_left_info = f"⏱️ Days left: {days_left}\n"
+        
+        # Format the response
+        reply = f"ℹ️ *Token Information*\n\n"
+        reply += f"🔑 Token: `{token}`\n"
+        reply += f"👤 Name: {name}\n"
+        reply += f"📧 Email: {email}\n"
+        reply += f"🖥️ Profile: {profile}\n"
+        reply += f"📅 Start: {start}\n"
+        reply += f"📅 End: {end}\n"
+        reply += days_left_info
+        reply += f"{status_emoji} Status: {status}\n"
+        reply += payment_info
+        reply += burned_info
+        
+        # Add client ID for admin reference
+        reply += f"🆔 Client ID: {client_id}\n"
+        
+        try:
+            await update.message.reply_text(reply, parse_mode="Markdown")
+        except Exception as e:
+            # Fallback if Markdown parsing fails
+            logger.error(f"Error sending formatted message: {e}")
+            await update.message.reply_text(reply)
     else:
-        reply = "❌ Token not found."
-    
-    try:
-        await update.message.reply_text(reply, parse_mode="Markdown")
-    except Exception as e:
-        # Fallback if Markdown parsing fails
-        logger.error(f"Error sending formatted message: {e}")
-        await update.message.reply_text(reply)
+        await update.message.reply_text("❌ Token not found.")
 
 # /admin - Check if user is an admin
 async def admin_check(update: Update, context: ContextTypes.DEFAULT_TYPE):

@@ -19,7 +19,7 @@ BURNED_SHEET = "burned_tokens"
 OPERATIONS_SHEET = "operations_log"
 
 # Define the service account file
-SERVICE_ACCOUNT_FILE = 'bot-netflix-473417-473511-10bd9ccf6f87.json'
+SERVICE_ACCOUNT_FILE = 'bot-netflix.json'
 
 # Global variables for connection
 _client = None
