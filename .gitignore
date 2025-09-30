@@ -5,3 +5,7 @@ myenv/
 exports/
 clients.db
 __pycache__
+
+# Google Cloud credentials
+*.json
+bot-netflix-*.json
